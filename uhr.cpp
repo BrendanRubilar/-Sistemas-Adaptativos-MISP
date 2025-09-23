@@ -1,14 +1,3 @@
-/** uhr: generic time performance tester
- * Author: LELE
- *
- * Things to set up:
- * 0. Includes: include all files to be tested,
- * 1. Time unit: in elapsed_time,
- * 2. What to write on time_data,
- * 3. Data type and distribution of RNG,
- * 4. Additive or multiplicative stepping,
- * 5. The experiments: in outer for loop. */
-
 #include <cstdint>
 #include <chrono>
 #include <cmath>
@@ -16,11 +5,10 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <iomanip> // para controlar formato decimal
 
 #include "utils.cpp"
 #include "Heuristica.cpp"
-
-// Include to be tested files here
 
 int main(int argc, char *argv[])
 {
@@ -28,74 +16,81 @@ int main(int argc, char *argv[])
     std::int64_t runs, lower, upper, step;
     validate_input(argc, argv, runs, lower, upper, step);
 
-    // Set up clock variables
-    std::int64_t n, i, executed_runs;
-    std::int64_t total_runs_additive = runs * (((upper - lower) / step) + 1);
-    std::int64_t total_runs_multiplicative = runs * (floor(log(upper / double(lower)) / log(step)) + 1);
+    // Clock vars
+    std::int64_t i, executed_runs;
+    // Total de corridas (densidades * instancias * runs)
+    int total_instances = (upper - lower) / step + 1; // si lower=1, upper=30, step=1 → 30
+    int total_densities = 9; // de 0.1 a 0.9
+    std::int64_t total_runs = runs * total_instances * total_densities;
+
     std::vector<double> times(runs);
     double mean_time, time_stdev, dev;
     auto begin_time = std::chrono::high_resolution_clock::now();
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::nano> elapsed_time = end_time - begin_time;
 
-    // Set up random number generation
+    // RNG
     std::random_device rd;
     std::mt19937_64 rng(rd());
-    std::uniform_int_distribution<std::int64_t> u_distr; // change depending on app
 
-    // File to write time data
-    std::ofstream time_data;
-    time_data.open(argv[1]);
-    time_data << "n,t_mean,t_stdev" << std::endl;
+    // Output file
+    std::ofstream time_data(argv[1]);
+    time_data << "density,instance,t_mean,t_stdev" << std::endl;
 
-    // Begin testing
+    // Run tests
     std::cerr << "\033[0;36mRunning tests...\033[0m" << std::endl << std::endl;
     executed_runs = 0;
-    
-    for (n = lower; n <= upper; n += step) {
-        mean_time = 0;
-        time_stdev = 0;
 
-        // Test configuration goes here
-        string filename = "erdos_n1000_p0c0.1_" + to_string(n);  // n será el número de instancia
+    for (int d = 1; d <= 9; d++) { // densidades 0.1 ... 0.9
+        double density = d / 10.0;
 
-        // Run to compute elapsed time
-        for (i = 0; i < runs; i++) {
-            // Remember to change total depending on step type
-            display_progress(++executed_runs, total_runs_additive);
+        for (int instance = lower; instance <= upper; instance += step) {
+            mean_time = 0;
+            time_stdev = 0;
 
-            begin_time = std::chrono::high_resolution_clock::now();
-            // Function to test goes here
-            load_graph_limit_nodes(filename, 1000);
-            auto orden = nodos_ordenados_por_grado_simple();
-            auto iset = misp_heuristica_por_orden(orden);
-            end_time = std::chrono::high_resolution_clock::now();
+            // Nombre del archivo: erdos_n1000_p0c0.X_Y.graph
+            std::ostringstream oss;
+            oss << "erdos_n1000_p0c0_" << std::fixed << std::setprecision(1)
+                << density << "_" << instance << ".graph";
+            std::string filename = oss.str();
 
-            elapsed_time = end_time - begin_time;
-            times[i] = elapsed_time.count();
+            // Múltiples ejecuciones para estadística
+            for (i = 0; i < runs; i++) {
+                display_progress(++executed_runs, total_runs);
 
-            mean_time += times[i];
+                begin_time = std::chrono::high_resolution_clock::now();
+                // ==== FUNCIONES A TESTEAR ====
+                load_graph_limit_nodes(filename, 1000);
+                auto orden = nodos_ordenados_por_grado_simple();
+                auto iset = misp_heuristica_por_orden(orden);
+                // ==============================
+                end_time = std::chrono::high_resolution_clock::now();
+
+                elapsed_time = end_time - begin_time;
+                times[i] = elapsed_time.count();
+
+                mean_time += times[i];
+            }
+
+            // Media
+            mean_time /= runs;
+
+            // Desviación estándar
+            for (i = 0; i < runs; i++) {
+                dev = times[i] - mean_time;
+                time_stdev += dev * dev;
+            }
+            time_stdev = std::sqrt(time_stdev / (runs - 1));
+
+            // Escribir fila con resultados
+            time_data << density << "," << instance << ","
+                      << mean_time << "," << time_stdev << std::endl;
         }
-
-        // Compute statistics
-        mean_time /= runs;
-
-        for (i = 0; i < runs; i++) {
-            dev = times[i] - mean_time;
-            time_stdev += dev * dev;
-        }
-
-        time_stdev /= runs - 1; // Subtract 1 to get unbiased estimator
-        time_stdev = std::sqrt(time_stdev);
-
-        time_data << "instance,t_mean,t_stdev" << std::endl;
     }
 
-    // This is to keep loading bar after testing
     std::cerr << std::endl << std::endl;
     std::cerr << "\033[1;32mDone!\033[0m" << std::endl;
 
     time_data.close();
-
     return 0;
 }
