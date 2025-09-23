@@ -51,11 +51,13 @@ int main(int argc, char *argv[])
     // Begin testing
     std::cerr << "\033[0;36mRunning tests...\033[0m" << std::endl << std::endl;
     executed_runs = 0;
+    
     for (n = lower; n <= upper; n += step) {
         mean_time = 0;
         time_stdev = 0;
 
         // Test configuration goes here
+        string filename = "erdos_n1000_p0c0.1_" + to_string(n);  // n será el número de instancia
 
         // Run to compute elapsed time
         for (i = 0; i < runs; i++) {
@@ -64,6 +66,9 @@ int main(int argc, char *argv[])
 
             begin_time = std::chrono::high_resolution_clock::now();
             // Function to test goes here
+            load_graph_limit_nodes(filename, 1000);
+            auto orden = nodos_ordenados_por_grado_simple();
+            auto iset = misp_heuristica_por_orden(orden);
             end_time = std::chrono::high_resolution_clock::now();
 
             elapsed_time = end_time - begin_time;
@@ -83,7 +88,7 @@ int main(int argc, char *argv[])
         time_stdev /= runs - 1; // Subtract 1 to get unbiased estimator
         time_stdev = std::sqrt(time_stdev);
 
-        time_data << n << "," << mean_time << "," << time_stdev << ",";
+        time_data << "instance,t_mean,t_stdev" << std::endl;
     }
 
     // This is to keep loading bar after testing
