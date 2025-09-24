@@ -13,6 +13,7 @@ void add_edge(int u, int v) {
     graph[u].vecinos.push_back(v);
 }
 
+// Funcion principal que lee el grafo desde un archivo.
 void load_graph_from_file(const string &filename) {
     ifstream f(filename);
     if (!f.is_open()) {
@@ -38,7 +39,7 @@ void load_graph_from_file(const string &filename) {
     }
     f.close();
 
-    //  CÓDIGO DE VERIFICACIÓN (ARREGLADO) 
+    //  Simple código que verifica que se estén leyendo correctamente los grafos.
     cout << "VERIFICACION DE LECTURA " << endl;
     cout << "Archivo: " << filename << endl;
 

@@ -6,9 +6,11 @@
 #include <random>
 #include <vector>
 #include <iomanip> // para controlar formato decimal
-
 #include "utils.cpp"
 #include "Heuristica.cpp"
+
+// ESTA SHIT ESTA COMENTADA PORQUE GENERA EL CSV DE ESTO COMPLETO: "/home/franc/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_1000_dataset/"; 
+// HAY QUE VERIFICAR DE ALGUNA FORMA? QUE LOS RESULTADOS SON CORRECTOS. PERO EL MAIN FUNCIONAL ES EL QUE DEMUESTRA QUE LEE CORRECTAMENTE LOS ARCHVIOS DE LOS GRAFOS C:
 
 /*int main(int argc, char *argv[])
 {
@@ -52,7 +54,7 @@
             std::string base_path = "/home/franc/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_1000_dataset/"; 
             oss << base_path << "erdos_n1000_p0c0.";
 
-            // Manejar los diferentes formatos de densidad
+            // Manejar los diferentes formatos de densidad de forma individual para evitar errores de precisión por instancias como 0.05, 0.15, 0.25, etc.
             if (std::abs(density - 0.05) < 1e-9) {
                 oss << "05";
             } else if (std::abs(density - 0.1) < 1e-9) {
@@ -136,10 +138,8 @@
     time_data.close();
     return 0;
 }
-    */
 
-    //uhr.cpp
-// ... (resto de los includes)
+*/
 
 
 
