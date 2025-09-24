@@ -1,14 +1,3 @@
-/** uhr: generic time performance tester
- * Author: LELE
- *
- * Things to set up:
- * 0. Includes: include all files to be tested,
- * 1. Time unit: in elapsed_time,
- * 2. What to write on time_data,
- * 3. Data type and distribution of RNG,
- * 4. Additive or multiplicative stepping,
- * 5. The experiments: in outer for loop. */
-
 #include <cstdint>
 #include <chrono>
 #include <cmath>
@@ -16,86 +5,183 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <iomanip> // para controlar formato decimal
 
 #include "utils.cpp"
 #include "Heuristica.cpp"
 
-// Include to be tested files here
-
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
     // Validate and sanitize input
     std::int64_t runs, lower, upper, step;
     validate_input(argc, argv, runs, lower, upper, step);
 
-    // Set up clock variables
-    std::int64_t n, i, executed_runs;
-    std::int64_t total_runs_additive = runs * (((upper - lower) / step) + 1);
-    std::int64_t total_runs_multiplicative = runs * (floor(log(upper / double(lower)) / log(step)) + 1);
+    // Clock vars
+    std::int64_t i, executed_runs;
+    // Total de corridas (densidades * instancias * runs)
+    int total_instances = (upper - lower) / step + 1; // si lower=1, upper=30, step=1 → 30
+    int total_densities = 9; // de 0.1 a 0.9
+    std::int64_t total_runs = runs * total_instances * total_densities;
+
     std::vector<double> times(runs);
     double mean_time, time_stdev, dev;
     auto begin_time = std::chrono::high_resolution_clock::now();
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::nano> elapsed_time = end_time - begin_time;
 
-    // Set up random number generation
+    // RNG
     std::random_device rd;
     std::mt19937_64 rng(rd());
-    std::uniform_int_distribution<std::int64_t> u_distr; // change depending on app
 
-    // File to write time data
-    std::ofstream time_data;
-    time_data.open(argv[1]);
-    time_data << "n,t_mean,t_stdev" << std::endl;
+    // Output file
+    std::ofstream time_data(argv[1]);
+    time_data << "density,instance,t_mean,t_stdev" << std::endl;
 
-    // Begin testing
+    // Run tests
     std::cerr << "\033[0;36mRunning tests...\033[0m" << std::endl << std::endl;
     executed_runs = 0;
-    
-    for (n = lower; n <= upper; n += step) {
-        mean_time = 0;
-        time_stdev = 0;
 
-        // Test configuration goes here
-        string filename = "erdos_n1000_p0c0.1_" + to_string(n);  // n será el número de instancia
+    for (int d = 1; d <= 9; d++) { // densidades 0.1 ... 0.9
+        double density = d / 10.0;
 
-        // Run to compute elapsed time
-        for (i = 0; i < runs; i++) {
-            // Remember to change total depending on step type
-            display_progress(++executed_runs, total_runs_additive);
+        for (int instance = lower; instance <= upper; instance += step) {
+            mean_time = 0;
+            time_stdev = 0;
 
-            begin_time = std::chrono::high_resolution_clock::now();
-            // Function to test goes here
-            load_graph_limit_nodes(filename, 1000);
-            auto orden = nodos_ordenados_por_grado_simple();
-            auto iset = misp_heuristica_por_orden(orden);
-            end_time = std::chrono::high_resolution_clock::now();
+            std::ostringstream oss;
+            std::string base_path = "/home/franc/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_1000_dataset/"; 
+            oss << base_path << "erdos_n1000_p0c0.";
 
-            elapsed_time = end_time - begin_time;
-            times[i] = elapsed_time.count();
+            // Manejar los diferentes formatos de densidad
+            if (std::abs(density - 0.05) < 1e-9) {
+                oss << "05";
+            } else if (std::abs(density - 0.1) < 1e-9) {
+                oss << "1";
+            } else if (std::abs(density - 0.15) < 1e-9) {
+                oss << "15";
+            } else if (std::abs(density - 0.2) < 1e-9) {
+                oss << "2";
+            } else if (std::abs(density - 0.25) < 1e-9) {
+                oss << "25";
+            } else if (std::abs(density - 0.3) < 1e-9) {
+                oss << "3";
+            } else if (std::abs(density - 0.35) < 1e-9) {
+                oss << "35";
+            } else if (std::abs(density - 0.4) < 1e-9) {
+                oss << "4";
+            } else if (std::abs(density - 0.45) < 1e-9) {
+                oss << "45";
+            } else if (std::abs(density - 0.5) < 1e-9) {
+                oss << "5";
+            } else if (std::abs(density - 0.55) < 1e-9) {
+                oss << "55";
+            } else if (std::abs(density - 0.6) < 1e-9) {
+                oss << "6";
+            } else if (std::abs(density - 0.65) < 1e-9) {
+                oss << "65";
+            } else if (std::abs(density - 0.7) < 1e-9) {
+                oss << "7";
+            } else if (std::abs(density - 0.75) < 1e-9) {
+                oss << "75";
+            } else if (std::abs(density - 0.8) < 1e-9) {
+                oss << "8";
+            } else if (std::abs(density - 0.85) < 1e-9) {
+                oss << "85";
+            } else if (std::abs(density - 0.9) < 1e-9) {
+                oss << "9";
+            } else if (std::abs(density - 0.95) < 1e-9) {
+                oss << "95";
+            }
 
-            mean_time += times[i];
+            oss << "_" << instance << ".graph";
+            std::string filename = oss.str();
+            // Múltiples ejecuciones para estadística
+            for (i = 0; i < runs; i++) {
+                display_progress(++executed_runs, total_runs);
+
+                begin_time = std::chrono::high_resolution_clock::now();
+                // ==== FUNCIONES A TESTEAR ====
+                // Se ha reemplazado 'load_graph_limit_nodes'
+                load_graph_from_file(filename);
+                auto orden = nodos_ordenados_por_grado_simple();
+                auto iset = misp_heuristica_por_orden(orden);
+                // ==============================
+                end_time = std::chrono::high_resolution_clock::now();
+
+                elapsed_time = end_time - begin_time;
+                times[i] = elapsed_time.count();
+
+                mean_time += times[i];
+            }
+
+            // Media
+            mean_time /= runs;
+
+            // Desviación estándar
+            for (i = 0; i < runs; i++) {
+                dev = times[i] - mean_time;
+                time_stdev += dev * dev;
+            }
+            time_stdev = std::sqrt(time_stdev / (runs - 1));
+
+            // Escribir fila con resultados
+            time_data << density << "," << instance << ","
+                      << mean_time << "," << time_stdev << std::endl;
         }
-
-        // Compute statistics
-        mean_time /= runs;
-
-        for (i = 0; i < runs; i++) {
-            dev = times[i] - mean_time;
-            time_stdev += dev * dev;
-        }
-
-        time_stdev /= runs - 1; // Subtract 1 to get unbiased estimator
-        time_stdev = std::sqrt(time_stdev);
-
-        time_data << "instance,t_mean,t_stdev" << std::endl;
     }
 
-    // This is to keep loading bar after testing
     std::cerr << std::endl << std::endl;
     std::cerr << "\033[1;32mDone!\033[0m" << std::endl;
 
     time_data.close();
+    return 0;
+}
+    */
 
+    //uhr.cpp
+// ... (resto de los includes)
+
+
+
+// Main de lectura de grafos, el funcionamiento esta arriba, LEE MUY LENTO LOS GRAFOS DE 1000 NODOS.
+namespace fs = std::filesystem;
+
+int main(int argc, char *argv[]) {
+    // Definir los rangos de las instancias
+    int lower = 1, upper = 30, step = 1;
+
+    // Ejecutar la rutina de pruebas
+    std::cerr << "Iniciando verificacion de dataset..." << std::endl << std::endl;
+
+    for (int d = 1; d <= 9; d++) { // Densidades de 0.1 a 0.9
+        double density = d / 10.0;
+
+        for (int instance = lower; instance <= upper; instance += step) {
+            std::ostringstream oss;
+            std::string base_path = "/home/franc/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_1000_dataset/"; 
+            oss << base_path << "erdos_n1000_p0c0.";
+
+            // Manejar los diferentes formatos de densidad
+            int density_int = static_cast<int>(density * 100);
+            if (density_int % 10 == 0) {
+                oss << (density_int / 10);
+            } else {
+                oss << density_int;
+            }
+
+            oss << "_" << instance << ".graph";
+            std::string filename = oss.str();
+            
+            // Llama a la funcion para cargar el grafo y verificar
+            // La funcion load_graph_from_file ya tiene la logica para imprimir la verificacion
+            load_graph_from_file(filename);
+
+            // Para detener la ejecucion y ver el resultado de una instancia a la vez
+            // std::cout << "Presiona ENTER para continuar con el siguiente archivo..." << std::endl;
+            // std::cin.ignore();
+        }
+    }
+
+    std::cerr << std::endl << "Verificacion completada para todos los archivos." << std::endl;
     return 0;
 }
