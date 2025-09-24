@@ -10,6 +10,9 @@
 #include "utils.cpp"
 #include "Heuristica.cpp"
 
+// ESTA SHIT ESTA COMENTADA PORQUE GENERA EL CSV DE ESTO COMPLETO: "/home/franc/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_1000_dataset/"; 
+// HAY QUE VERIFICAR DE ALGUNA FORMA? QUE LOS RESULTADOS SON CORRECTOS. PERO EL MAIN FUNCIONAL ES EL QUE DEMUESTRA QUE LEE CORRECTAMENTE LOS ARCHVIOS DE LOS GRAFOS C:
+
 int main(int argc, char *argv[])
 {
     // Validate and sanitize input
@@ -48,21 +51,63 @@ int main(int argc, char *argv[])
             mean_time = 0;
             time_stdev = 0;
 
-            // Nombre del archivo: erdos_n1000_p0c0.X_Y.graph
             std::ostringstream oss;
-            oss << "erdos_n1000_p0c0_" << std::fixed << std::setprecision(1)
-                << density << "_" << instance << ".graph";
-            std::string filename = oss.str();
+            std::string base_path = "/home/willi/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_3000_dataset/"; 
+            oss << base_path << "erdos_n3000_p0c0.";
 
+            // Manejar los diferentes formatos de densidad de forma individual para evitar errores de precisión por instancias como 0.05, 0.15, 0.25, etc.
+            if (std::abs(density - 0.05) < 1e-9) {
+                oss << "05";
+            } else if (std::abs(density - 0.1) < 1e-9) {
+                oss << "1";
+            } else if (std::abs(density - 0.15) < 1e-9) {
+                oss << "15";
+            } else if (std::abs(density - 0.2) < 1e-9) {
+                oss << "2";
+            } else if (std::abs(density - 0.25) < 1e-9) {
+                oss << "25";
+            } else if (std::abs(density - 0.3) < 1e-9) {
+                oss << "3";
+            } else if (std::abs(density - 0.35) < 1e-9) {
+                oss << "35";
+            } else if (std::abs(density - 0.4) < 1e-9) {
+                oss << "4";
+            } else if (std::abs(density - 0.45) < 1e-9) {
+                oss << "45";
+            } else if (std::abs(density - 0.5) < 1e-9) {
+                oss << "5";
+            } else if (std::abs(density - 0.55) < 1e-9) {
+                oss << "55";
+            } else if (std::abs(density - 0.6) < 1e-9) {
+                oss << "6";
+            } else if (std::abs(density - 0.65) < 1e-9) {
+                oss << "65";
+            } else if (std::abs(density - 0.7) < 1e-9) {
+                oss << "7";
+            } else if (std::abs(density - 0.75) < 1e-9) {
+                oss << "75";
+            } else if (std::abs(density - 0.8) < 1e-9) {
+                oss << "8";
+            } else if (std::abs(density - 0.85) < 1e-9) {
+                oss << "85";
+            } else if (std::abs(density - 0.9) < 1e-9) {
+                oss << "9";
+            } else if (std::abs(density - 0.95) < 1e-9) {
+                oss << "95";
+            }
+
+            oss << "_" << instance << ".graph";
+            std::string filename = oss.str();
             // Múltiples ejecuciones para estadística
             for (i = 0; i < runs; i++) {
                 display_progress(++executed_runs, total_runs);
 
                 begin_time = std::chrono::high_resolution_clock::now();
                 // ==== FUNCIONES A TESTEAR ====
-                load_graph_limit_nodes(filename, 1000);
-                auto orden = nodos_ordenados_por_grado_simple();
-                auto iset = misp_heuristica_por_orden(orden);
+                
+                load_graph(filename);
+                //auto iset = misp_heuristica_greedy();
+                auto iset = misp_greedy_aleatorizado(0.1);
                 // ==============================
                 end_time = std::chrono::high_resolution_clock::now();
 
