@@ -1,0 +1,125 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Vertice {
+    vector<int> vecinos;
+    bool eliminado = false;
+};
+
+vector<Vertice> graph;
+int n;
+
+void add_edge(int u, int v) {
+    graph[u].vecinos.push_back(v);
+}
+
+void load_graph(const string &filename) {
+    ifstream f(filename);
+    if (!f.is_open()) {
+        cerr << "Error abriendo archivo: " << filename << "\n";
+        n = 0;
+        graph.clear();
+        return;
+    }
+
+    f >> n;
+    graph.assign(n, Vertice{});
+
+    int u, v;
+    while (f >> u >> v) {
+        if (u >= 0 && u < n && v >= 0 && v < n) {
+            graph[u].vecinos.push_back(v);
+            graph[v].vecinos.push_back(u); // grafo no dirigido
+        }
+    }
+
+    f.close();
+}
+
+vector<int> nodos_ordenados_por_grado_simple() {
+    vector<pair<int, int>> nodos_con_grado;
+    nodos_con_grado.reserve(n);
+    
+    for (int i = 0; i < n; ++i) {
+        int grado = (int)graph[i].vecinos.size();
+        nodos_con_grado.emplace_back(grado, i);
+    }
+    
+    // Ordena por grado (ascendente), desempate por ID
+    sort(nodos_con_grado.begin(), nodos_con_grado.end());
+    
+    vector<int> orden;
+    orden.reserve(n);
+    for (auto& par : nodos_con_grado) {
+        orden.push_back(par.second); // agrega el ID del nodo
+    }
+    
+    return orden;
+}
+
+vector<int> misp_heuristica_por_orden(const vector<int>& orden) {
+    vector<unsigned char> bloqueado(n, 0);
+    vector<int> iset;
+    iset.reserve(n);
+
+    for (int u : orden) {
+        if (!bloqueado[u]) {
+            iset.push_back(u);
+            bloqueado[u] = 1;
+            for (int v : graph[u].vecinos) {
+                bloqueado[v] = 1;
+            }
+        }
+    }
+    return iset;
+}
+
+vector<int> misp_greedy_aleatorizado() {
+    vector<unsigned char> disponible(n, 1);
+    vector<int> iset;
+    iset.reserve(n);
+
+    int restantes = n;
+
+    while (restantes > 0) {
+        vector<pair<int,int>> candidatos;
+        candidatos.reserve(restantes);
+        for (int u = 0; u < n; ++u) {
+            if (disponible[u]) {
+                int grado = (int)graph[u].vecinos.size();
+                candidatos.emplace_back(grado, u);
+            }
+        }
+
+        if (candidatos.empty()) break;
+
+        sort(candidatos.begin(), candidatos.end());
+
+        int tam_bloque = (int)ceil(candidatos.size() * 0.01);
+
+        int idx = rand() % tam_bloque;
+        int elegido = candidatos[idx].second;
+
+        iset.push_back(elegido);
+
+        disponible[elegido] = 0;
+        restantes--;
+        for (int v : graph[elegido].vecinos) {
+            if (disponible[v]) {
+                disponible[v] = 0;
+                restantes--;
+            }
+        }
+    }
+
+    return iset;
+}
+
+int main( ){
+    srand(time(NULL));
+    load_graph("dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_2.graph");
+    auto iset2 = misp_greedy_aleatorizado();
+    cout << "Tamaño del MIS aproximado (Greedy Aleatorizado): " << iset2.size() << "\n";
+    return 0;
+}
+
