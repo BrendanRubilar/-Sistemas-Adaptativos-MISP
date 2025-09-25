@@ -22,7 +22,7 @@ Formato general:
 ```
 Parámetros:
 - `<ruta_instancia>`: archivo .graph (primer número = n, luego pares u v).
-- `<alpha>`: 0 < alpha ≤ 1. Controla el grado de aleatoriedad (porción de candidatos considerados).
+- `<alpha>`: 0 < alpha ≤ 1. Controla el grado de aleatoriedad (porción de candidatos considerados (#Nodos disponibles * alpha)).
 
 Ejemplos:
 ```bash
