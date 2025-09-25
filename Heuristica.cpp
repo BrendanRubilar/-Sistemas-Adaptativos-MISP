@@ -41,7 +41,6 @@ vector<int> misp_heuristica_greedy() {
     vector<int> iset;
     iset.reserve(n);
 
-    // Crear lista de nodos ordenados por grado (ascendente)
     vector<pair<int, int>> nodos_con_grado;
     nodos_con_grado.reserve(n);
     
@@ -50,12 +49,10 @@ vector<int> misp_heuristica_greedy() {
         nodos_con_grado.emplace_back(grado, i);
     }
     
-    // Ordena por grado (ascendente), desempate por ID
     sort(nodos_con_grado.begin(), nodos_con_grado.end());
 
-    // Aplicar heurística greedy
     for (auto& par : nodos_con_grado) {
-        int u = par.second; // ID del nodo
+        int u = par.second;
         if (!bloqueado[u]) {
             iset.push_back(u);
             bloqueado[u] = 1;
@@ -68,7 +65,7 @@ vector<int> misp_heuristica_greedy() {
     return iset;
 }
 
-vector<int> misp_greedy_aleatorizado(float k) {
+vector<int> misp_greedy_aleatorizado(float alpha) {
     vector<unsigned char> disponible(n, 1);
     vector<int> iset;
     iset.reserve(n);
@@ -89,7 +86,7 @@ vector<int> misp_greedy_aleatorizado(float k) {
 
         sort(candidatos.begin(), candidatos.end());
 
-        int tam_bloque = (int)ceil(candidatos.size() * k);
+        int tam_bloque = max(1, (int)ceil(candidatos.size() * alpha));
 
         int idx = rand() % tam_bloque;
         int elegido = candidatos[idx].second;
@@ -109,12 +106,60 @@ vector<int> misp_greedy_aleatorizado(float k) {
     return iset;
 }
 
-// int main( ){
-//     srand(time(NULL));
-//     load_graph("dataset_grafos_no_dirigidos/new_1000_dataset/erdos_n1000_p0c0.1_2.graph");
-//     //auto iset2 = misp_heuristica_greedy();
-//     auto iset2 = misp_greedy_aleatorizado(0.1);
-//     cout << "Tamaño del MIS aproximado (Greedy Aleatorizado): " << iset2.size() << "\n";
-//     return 0;
-// }
+int main2(int argc, char* argv[]) {
+    srand(time(nullptr));
+    auto print_usage = [](){
+        cerr << "Uso:\n"
+             << "  ./Heuristica Greedy -i <archivo_instancia>\n"
+             << "  ./Heuristica Greedy-probabilista -i <archivo_instancia> <alpha>\n"
+             << "    alpha en (0,1], fracción de candidatos considerados.\n";
+    };
 
+    if (argc < 4) {
+        print_usage();
+        return 1;
+    }
+
+    string metodo = argv[1];
+    string flag = argv[2];
+    if (flag != "-i") {
+        cerr << "Error: falta -i <archivo_instancia>\n";
+        print_usage();
+        return 1;
+    }
+    string archivo_instancia = argv[3];
+
+    bool probabilista = (metodo == "Greedy-probabilista");
+    float alpha = 0.0f;
+    if (probabilista) {
+        if (argc < 5) {
+            cerr << "Error: falta <alpha>\n";
+            print_usage();
+            return 1;
+        }
+        alpha = stof(argv[4]);
+        if (alpha <= 0.0f || alpha > 1.0f) {
+            cerr << "Error: alpha debe estar en (0,1].\n";
+            return 1;
+        }
+    } else if (metodo != "Greedy") {
+        cerr << "Método desconocido: " << metodo << "\n";
+        print_usage();
+        return 1;
+    }
+
+    load_graph(archivo_instancia);
+    if (n == 0) {
+        cerr << "No se cargó el grafo.\n";
+        return 1;
+    }
+
+    vector<int> solucion = probabilista
+        ? misp_greedy_aleatorizado(alpha)
+        : misp_heuristica_greedy();
+
+    cout << "Solución (" << solucion.size() << " nodos):\n";
+    for (int u : solucion) cout << u << " ";
+    cout << "\n";
+    return 0;
+}
