@@ -29,7 +29,7 @@ void load_graph(const string &filename) {
     while (f >> u >> v) {
         if (u >= 0 && u < n && v >= 0 && v < n) {
             graph[u].vecinos.push_back(v);
-            graph[v].vecinos.push_back(u); // grafo no dirigido
+            graph[v].vecinos.push_back(u); 
         }
     }
 
@@ -106,7 +106,7 @@ vector<int> misp_greedy_aleatorizado(float alpha) {
     return iset;
 }
 
-int main2(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     srand(time(nullptr));
     auto print_usage = [](){
         cerr << "Uso:\n"
