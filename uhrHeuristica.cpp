@@ -7,12 +7,37 @@
 #include <iomanip>
 #include <sstream>
 
+#include <filesystem>
+#include <streambuf>
+
 #include "utils.cpp"
 #include "Metaheuristica.cpp"
+
+// Tee streambuf: duplica lo escrito a std::cout hacia consola + archivo
+class TeeBuf : public std::streambuf {
+    std::streambuf* sb1_;
+    std::streambuf* sb2_;
+public:
+    TeeBuf(std::streambuf* sb1, std::streambuf* sb2) : sb1_(sb1), sb2_(sb2) {}
+protected:
+    int overflow(int c) override {
+        if (c == EOF) return !EOF;
+        const int r1 = sb1_->sputc(c);
+        const int r2 = sb2_->sputc(c);
+        return (r1 == EOF || r2 == EOF) ? EOF : c;
+    }
+    int sync() override {
+        int const r1 = sb1_->pubsync();
+        int const r2 = sb2_->pubsync();
+        return (r1 == 0 && r2 == 0) ? 0 : -1;
+    }
+};
 
 int main(int argc, char *argv[])
 {
     std::uint32_t base_seed = 123456789u; // base fija para reproducibilidad
+
+    std::filesystem::create_directories("logs");
 
 
     std::int64_t runs, lower, upper, step;
@@ -53,9 +78,22 @@ int main(int argc, char *argv[])
                 oss << base_path << "erdos_n" << size << "_p0c0." << d
                     << "_" << instance << ".graph";
                 std::string filename = oss.str();
-                load_graph(filename);
+                //load_graph(filename); se supone que run grasp ya lo hace
                 for (int r = 0; r < runs; ++r) {
                     display_progress(++executed_runs, total_runs);
+
+                    //TESTEAR LOGS!!!------------------------
+                    // Archivo de log por ejecución
+                    std::ostringstream log_name;
+                    log_name << "logs/grasp_n" << size << "_p0c0." << d
+                             << "_" << instance << "_r" << r << ".log";
+                    std::ofstream log_file(log_name.str(), std::ios::out | std::ios::trunc);
+
+                    // Redirigir cout a consola+archivo mientras corre run_grasp
+                    TeeBuf tee(std::cout.rdbuf(), log_file.rdbuf());
+                    std::ostream tee_stream(&tee);
+                    auto* cout_backup = std::cout.rdbuf(tee_stream.rdbuf());
+                    //TESTEAR LOGS!!!------------------------
 
                     auto begin_time = std::chrono::high_resolution_clock::now();
 
@@ -63,6 +101,14 @@ int main(int argc, char *argv[])
                     auto sol = run_grasp(filename, 10, 0.1, base_seed);
 
                     auto end_time = std::chrono::high_resolution_clock::now();
+
+                    //TESTEAR LOGS!!!------------------------
+                    // Restaurar cout y cerrar log
+                    std::cout.rdbuf(cout_backup);
+                    log_file.flush();
+                    //TESTEAR LOGS!!!------------------------
+
+
                     std::chrono::duration<double, std::nano> elapsed = end_time - begin_time;
 
                     density_times.push_back(elapsed.count());
