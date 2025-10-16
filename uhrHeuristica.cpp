@@ -7,12 +7,14 @@
 #include <iomanip>
 #include <sstream>
 
-
 #include "utils.cpp"
 #include "Metaheuristica.cpp"
 
 int main(int argc, char *argv[])
 {
+    std::uint32_t base_seed = 123456789u; // base fija para reproducibilidad
+
+
     std::int64_t runs, lower, upper, step;
     validate_input(argc, argv, runs, lower, upper, step);
 
@@ -58,13 +60,13 @@ int main(int argc, char *argv[])
                     auto begin_time = std::chrono::high_resolution_clock::now();
 
                     //aqui fcking aqui los test!
-                    run_grasp(filename, 10, 0.1, static_cast<std::uint64_t>(rng()));
+                    auto sol = run_grasp(filename, 10, 0.1, base_seed);
 
                     auto end_time = std::chrono::high_resolution_clock::now();
                     std::chrono::duration<double, std::nano> elapsed = end_time - begin_time;
 
                     density_times.push_back(elapsed.count());
-                    density_sizes.push_back((int)iset.size());
+                    density_sizes.push_back(static_cast<int>(sol.size()));
                 }
             }
 

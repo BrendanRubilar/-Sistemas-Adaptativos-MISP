@@ -187,7 +187,7 @@ std::vector<int> build_randomized_greedy_solution(double alpha, std::mt19937& g)
     return iset;
 }
 
-std::vector<int> run_grasp(const std::string& filename, int max_seconds, double alpha, std::uint64_t seed) {
+std::vector<int> run_grasp(const std::string& filename, int max_seconds, double alpha, std::uint32_t seed) {
     // Configuración de la semilla para la aleatoriedad
     std::mt19937 g(seed);
 
