@@ -13,7 +13,7 @@
 #include "utils.cpp"
 #include "Metaheuristica.cpp"
 
-// Tee streambuf: duplica lo escrito a std::cout hacia consola + archivo
+// Tee streambuf: duplica lo escrito a std::cout hacia consola + archivo (Esto lo propuso el Copilot, es una función auxiliar asi que no es necesario que se entienda a fondo)
 class TeeBuf : public std::streambuf {
     std::streambuf* sb1_;
     std::streambuf* sb2_;
@@ -35,9 +35,9 @@ protected:
 
 int main(int argc, char *argv[])
 {
-    std::uint32_t base_seed = 123456789u; // base fija para reproducibilidad
+    std::uint32_t base_seed = 123456789u; // base fija para reproducibilidad, asi podemos volver a repetir los experimentos
 
-    std::filesystem::create_directories("logs");
+    std::filesystem::create_directories("logs"); //Carpeta para los logs :)
 
 
     std::int64_t runs, lower, upper, step;
@@ -78,11 +78,11 @@ int main(int argc, char *argv[])
                 oss << base_path << "erdos_n" << size << "_p0c0." << d
                     << "_" << instance << ".graph";
                 std::string filename = oss.str();
-                //load_graph(filename); se supone que run grasp ya lo hace
+                //load_graph(filename); se supone que run grasp ya lo hace, seria redundante volver a hacer esto, fcking mukso
                 for (int r = 0; r < runs; ++r) {
                     display_progress(++executed_runs, total_runs);
 
-                    //TESTEAR LOGS!!!------------------------
+                    //LOGS------------------------
                     // Archivo de log por ejecución
                     std::ostringstream log_name;
                     log_name << "logs/grasp_n" << size << "_p0c0." << d
@@ -93,20 +93,20 @@ int main(int argc, char *argv[])
                     TeeBuf tee(std::cout.rdbuf(), log_file.rdbuf());
                     std::ostream tee_stream(&tee);
                     auto* cout_backup = std::cout.rdbuf(tee_stream.rdbuf());
-                    //TESTEAR LOGS!!!------------------------
+                    //LOGS------------------------
 
                     auto begin_time = std::chrono::high_resolution_clock::now();
 
                     //aqui fcking aqui los test!
-                    auto sol = run_grasp(filename, 10, 0.1, base_seed);
+                    auto sol = run_grasp(filename, 1, 0.1, base_seed); 
 
                     auto end_time = std::chrono::high_resolution_clock::now();
 
-                    //TESTEAR LOGS!!!------------------------
+                    //LOGS------------------------
                     // Restaurar cout y cerrar log
                     std::cout.rdbuf(cout_backup);
                     log_file.flush();
-                    //TESTEAR LOGS!!!------------------------
+                    //LOGS------------------------
 
 
                     std::chrono::duration<double, std::nano> elapsed = end_time - begin_time;
