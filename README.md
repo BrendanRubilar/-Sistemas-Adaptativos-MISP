@@ -2,6 +2,7 @@
 
 ## 1. Archivos principales
 - `Heuristica.cpp`: Implementa heurística Greedy y Greedy-probabilista.
+- `Metaheuristica.cpp`: Implementa algoritmo GRASP (Usando búsqueda local).
 - `uhr.cpp`: Ejecuta experimentos sobre múltiples instancias (tamaños y densidades), midiendo tiempo y tamaño del conjunto independiente, se usa para el dataset completo.
 - `dataset_grafos_no_dirigidos/`: Dataset a utilizar para las pruebas.
 
@@ -53,6 +54,7 @@ Ejemplo (30 instancias, runs=32):
 Genera:
 - `resultados.csv`: Resumen global por (size,density).
 - `resultados_1000.csv`, `resultados_2000.csv`, `resultados_3000.csv`: Resumen por tamaño.
+- `Directorio logs`: En caso de usar UhrMetaheuristica, almacena todas las salidas de terminal.
 
 Columnas:
 ```
