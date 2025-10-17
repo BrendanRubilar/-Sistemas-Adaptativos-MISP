@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
                     auto begin_time = std::chrono::high_resolution_clock::now();
 
                     //aqui fcking aqui los test!
-                    auto sol = run_grasp(filename, 1, 0.1, base_seed); 
+                    auto sol = run_grasp(filename, 10, 0.1, base_seed); 
 
                     auto end_time = std::chrono::high_resolution_clock::now();
 
