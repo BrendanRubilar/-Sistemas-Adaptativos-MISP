@@ -93,7 +93,7 @@ std::vector<int> local_search(const std::vector<int>& initial_sol) {
                 }
             }
 
-            std::vector<int> potential_adds; pot_adds: simplificado
+            std::vector<int> potential_adds;
             for(int i = 0; i < n; ++i) {
                 if (!is_in_s[i]) {
                     bool can_add = true;
@@ -233,14 +233,13 @@ std::vector<int> run_grasp(const std::string& filename, int max_seconds, double 
 }
 
 // Función principal adaptada para cumplir con los requisitos
-/*int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     // Parámetros por defecto
     std::string filename = "erdos_n1000_p0c0.1_1.graph";
     int max_seconds = 60;
     double alpha = 0.5;
     unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
-    // Análisis de los argumentos de la línea de comandos
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
@@ -255,11 +254,9 @@ std::vector<int> run_grasp(const std::string& filename, int max_seconds, double 
             }
         }
     }
-    
-    // Configuración de la semilla para la aleatoriedad
+
     std::mt19937 g(seed);
 
-    // Cargar el grafo sin un límite explícito de nodos, se obtiene del nombre del archivo
     load_graph(filename);
 
     if (n == 0) {
@@ -290,13 +287,11 @@ std::vector<int> run_grasp(const std::string& filename, int max_seconds, double 
         if (improved_solution.size() > best_solution.size()) {
             best_solution = improved_solution;
             best_time = elapsed.count();
-            // Salida para el Any-Time Behavior
             std::cout << "Nueva mejor solucion encontrada:\n";
             std::cout << "Calidad: " << best_solution.size() << ", Tiempo: " << std::fixed << std::setprecision(3) << best_time << "s\n\n";
         }
     }
 
-    // Salida final
     std::cout << "----------------------------------------\n";
     std::cout << "Fin de la ejecucion. Resultados finales:\n";
     std::cout << "Mejor solucion encontrada: " << best_solution.size() << "\n";
@@ -305,4 +300,3 @@ std::vector<int> run_grasp(const std::string& filename, int max_seconds, double 
 
     return 0;
 }
-*/

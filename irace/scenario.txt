@@ -1,0 +1,14 @@
+# --- Rutas Absolutas para todos los archivos ---
+targetRunner = "/home/willi/-Sistemas-Adaptativos-MISP/scripts/runner.sh"
+parameterFile = "/home/willi/-Sistemas-Adaptativos-MISP/irace/parameters.txt"
+instanceFile = "/home/willi/-Sistemas-Adaptativos-MISP/irace/instances.txt"
+#ESTO EN LOCAL NO QUIERE FUCKING FUNCIONAR 
+
+# Presupuesto de tuning
+maxExperiments = 20
+
+# Algoritmo no determinista
+deterministic = 0
+
+# Dónde guardar los logs de irace
+logFile = "/home/willi/-Sistemas-Adaptativos-MISP/irace/irace-log.Rdata"

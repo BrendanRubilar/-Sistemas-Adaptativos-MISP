@@ -1,0 +1,7 @@
+# name  switch  type  domain                # Corresponde a los flags de tu main()
+p       "-p"    i     (20, 500)             # population_size
+e       "-e"    r     (0.05, 0.5)           # elite_fraction
+m       "-m"    r     (0.01, 0.4)           # mutant_fraction
+r       "-r"    r     (0.50, 0.95)          # inheritance_prob (rho)
+L       "-L"    r     (0.0, 1.0)            # local_search_probability
+l       "-l"    c     (0, 1)                # use_local_search (0=no, 1=si)
