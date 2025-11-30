@@ -1,0 +1,5 @@
+/home/willi/-Sistemas-Adaptativos-MISP/erdos_n1000_p0c0.1_1.graph
+#agregar más instancias para el tuning. Por ejemplo:
+# erdos_n1000_p0c0.1_2.graph
+# brock200_1.clq
+# C125.9.clq

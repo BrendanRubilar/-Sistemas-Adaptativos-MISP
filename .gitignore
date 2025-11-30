@@ -1,0 +1,11 @@
+# Datasets
+dataset_grafos_no_dirigidos/
+*.graph
+
+# (opcional) otros comunes
+.vscode/
+__pycache__/
+*.py[cod]
+*.o
+*.out
+#logs/

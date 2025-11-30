@@ -1,0 +1,23 @@
+Algoritmo: GRASP para MISP
+Instancia: /home/willi/-Sistemas-Adaptativos-MISP/dataset_grafos_no_dirigidos/new_3000_dataset/erdos_n3000_p0c0.1_1.graph
+Nodos: 3000
+Tiempo maximo: 10s
+Parametros: alpha=0.100, seed=123456789
+
+Nueva mejor solucion encontrada:
+Calidad: 71, Tiempo: 0.000s
+
+Nueva mejor solucion encontrada:
+Calidad: 73, Tiempo: 0.030s
+
+Nueva mejor solucion encontrada:
+Calidad: 74, Tiempo: 0.161s
+
+Nueva mejor solucion encontrada:
+Calidad: 76, Tiempo: 0.228s
+
+----------------------------------------
+Fin de la ejecucion. Resultados finales:
+Mejor solucion encontrada: 76
+Tiempo en que se encontro: 0.228s
+----------------------------------------
