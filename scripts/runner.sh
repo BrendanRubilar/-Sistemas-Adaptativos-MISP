@@ -15,7 +15,7 @@ shift 2
 CONFIG_PARAMS="$@"
 
 # --- 2. Configuración ---
-TIME_LIMIT="60" # Tiempo para cada ejecución de irace
+TIME_LIMIT="10" # Tiempo para cada ejecución de irace
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXECUTABLE="$PROJECT_ROOT/MetaheuristicaPoblacional"
 
